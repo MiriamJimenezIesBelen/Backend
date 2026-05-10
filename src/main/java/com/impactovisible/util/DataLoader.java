@@ -27,7 +27,9 @@ public class DataLoader implements CommandLineRunner {
   @Transactional
   public void run(String... args) {
 
-    if (empresaRepository.count() > 0) {
+    String forceReload = System.getenv("FORCE_DATA_RELOAD");
+
+    if (!"true".equals(forceReload) && empresaRepository.count() > 0) {
       log.info("Ya hay datos, saltando DataLoader.");
       return;
     }
