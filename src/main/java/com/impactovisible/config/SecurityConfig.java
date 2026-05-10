@@ -25,7 +25,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.CorsUtils;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import java.util.Arrays;
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -46,13 +46,13 @@ public class SecurityConfig {
 
     http
 
+      .csrf(csrf -> csrf.disable())
+
       .cors(cors ->
         cors.configurationSource(
           corsConfigurationSource()
         )
       )
-
-      .csrf(csrf -> csrf.disable())
 
       .sessionManagement(sess ->
         sess.sessionCreationPolicy(
@@ -62,7 +62,6 @@ public class SecurityConfig {
 
       .authorizeHttpRequests(auth -> auth
 
-        // PREFLIGHT
         .requestMatchers(
           CorsUtils::isPreFlightRequest
         ).permitAll()
@@ -90,7 +89,7 @@ public class SecurityConfig {
           "/api/ranking/**"
         ).permitAll()
 
-        // TODO LO DEMAS
+        // RESTO
         .anyRequest().authenticated()
       )
 
@@ -108,15 +107,12 @@ public class SecurityConfig {
     CorsConfiguration configuration =
       new CorsConfiguration();
 
-    configuration.setAllowedOrigins(
-      Arrays.asList(
-        "http://localhost:4200",
-        "https://frontend-991y.onrender.com"
-      )
+    configuration.setAllowedOriginPatterns(
+      List.of("*")
     );
 
     configuration.setAllowedMethods(
-      Arrays.asList(
+      List.of(
         "GET",
         "POST",
         "PUT",
@@ -126,14 +122,10 @@ public class SecurityConfig {
     );
 
     configuration.setAllowedHeaders(
-      Arrays.asList(
-        "Authorization",
-        "Content-Type",
-        "Accept"
-      )
+      List.of("*")
     );
 
-    configuration.setAllowCredentials(true);
+    configuration.setAllowCredentials(false);
 
     UrlBasedCorsConfigurationSource source =
       new UrlBasedCorsConfigurationSource();
