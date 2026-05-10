@@ -10,18 +10,29 @@ import java.util.stream.Collectors;
 
 @Service
 public class MaquinaService {
-    private final MaquinaRepository maquinaRepository;
-    public MaquinaService(MaquinaRepository maquinaRepository) { this.maquinaRepository = maquinaRepository; }
+  private final MaquinaRepository maquinaRepository;
 
-    public List<MaquinaDTO> findAll() {
-        return maquinaRepository.findAll().stream().map(this::convertToDTO).collect(Collectors.toList());
-    }
+  public MaquinaService(MaquinaRepository maquinaRepository) {
+    this.maquinaRepository = maquinaRepository;
+  }
 
-    private MaquinaDTO convertToDTO(Maquina m) {
-        return MaquinaDTO.builder()
-                .codigoMaquina(m.getCodigoMaquina())
-                .nombre(m.getNombre())
-                .tipo(m.getTipo())
-                .build();
-    }
+  public List<MaquinaDTO> findAll() {
+    return maquinaRepository.findAll().stream()
+      .map(this::convertToDTO)
+      .collect(Collectors.toList());
+  }
+
+  public List<MaquinaDTO> findByEmpresa(Long idEmpresa) {
+    return maquinaRepository.findByPlanta_Empresa_IdEmpresa(idEmpresa).stream()
+      .map(this::convertToDTO)
+      .collect(Collectors.toList());
+  }
+
+  private MaquinaDTO convertToDTO(Maquina m) {
+    return MaquinaDTO.builder()
+      .codigoMaquina(m.getCodigoMaquina())
+      .nombre(m.getNombre())
+      .tipo(m.getTipo())
+      .build();
+  }
 }
