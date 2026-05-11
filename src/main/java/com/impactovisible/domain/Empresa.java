@@ -7,44 +7,53 @@ import java.util.List;
 
 @Entity
 @Table(name = "empresas")
-@Getter @Setter
-@AllArgsConstructor @NoArgsConstructor
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 @Builder
 @ToString(exclude = "plantas")
 @EqualsAndHashCode(of = "idEmpresa")
 public class Empresa {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long idEmpresa;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Column(name = "id_empresa")
+  private Long idEmpresa;
 
-    @JsonProperty("numeroRegistro")
-    private String numeroRegistro;
-    private String nombre;
+  @Column(name = "numero_registro")
+  private String numeroRegistro;
 
-    private String password;
+  @Column(name = "nombre")
+  private String nombre;
 
-    private String sector;
-    private String pais;
-    private String ciudad;
+  @Column(name = "password")
+  private String password;
 
-    @Enumerated(EnumType.STRING)
-    private Tamano tamano;
+  @Column(name = "sector")
+  private String sector;
 
-  @JsonProperty("correoContacto")
-  @Column(unique = true, nullable = false)
+  @Column(name = "pais")
+  private String pais;
+
+  @Column(name = "ciudad")
+  private String ciudad;
+
+  @Enumerated(EnumType.STRING)
+  @Column(name = "tamano")
+  private Tamano tamano;
+
+  @Column(name = "correo_contacto", unique = true, nullable = false)
   private String correoContacto;
 
-    @Enumerated(EnumType.STRING)
-    private Rol rol;
+  @Enumerated(EnumType.STRING)
+  @Column(name = "rol")
+  private Rol rol;
 
-    @OneToMany(mappedBy = "empresa")
-    private List<Planta> plantas;
+  @OneToMany(mappedBy = "empresa")
+  private List<Planta> plantas;
 
-    public enum Tamano { pequena, mediana, grande }
+  public enum Tamano { pequena, mediana, grande }
 
-    public enum Rol {
-        USER,
-        ADMIN
-    }
+  public enum Rol { USER, ADMIN }
 }
