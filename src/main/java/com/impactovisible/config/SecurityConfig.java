@@ -36,43 +36,67 @@ public class SecurityConfig {
 
   @Bean
   public PasswordEncoder passwordEncoder() {
+
     return new BCryptPasswordEncoder();
   }
 
   @Bean
-  public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+  public SecurityFilterChain filterChain(HttpSecurity http)
+    throws Exception {
 
     http
+
       .csrf(csrf -> csrf.disable())
 
-      .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+      .cors(cors ->
+        cors.configurationSource(
+          corsConfigurationSource()
+        )
+      )
 
       .sessionManagement(sess ->
-        sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+        sess.sessionCreationPolicy(
+          SessionCreationPolicy.STATELESS
+        )
       )
 
       .authorizeHttpRequests(auth -> auth
 
-        // Preflight CORS
-        .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
+        .requestMatchers(
+          CorsUtils::isPreFlightRequest
+        ).permitAll()
 
         // LOGIN
-        .requestMatchers(HttpMethod.POST, "/api/empresas/login").permitAll()
+        .requestMatchers(
+          HttpMethod.POST,
+          "/api/empresas/login"
+        ).permitAll()
 
-        // REGISTRO PÚBLICO (formulario de alta de nuevas empresas)
-        .requestMatchers(HttpMethod.POST, "/api/empresas", "/api/empresas/").permitAll()
+        // REGISTER
+        .requestMatchers(
+          HttpMethod.POST,
+          "/api/empresas"
+        ).permitAll()
 
-        // LISTADO (usado por el frontend para comprobar si el backend responde)
-        .requestMatchers(HttpMethod.GET, "/api/empresas", "/api/empresas/").permitAll()
+        // PING
+        .requestMatchers(
+          HttpMethod.GET,
+          "/api/empresas"
+        ).permitAll()
 
         // RANKING
-        .requestMatchers("/api/ranking/**").permitAll()
+        .requestMatchers(
+          "/api/ranking/**"
+        ).permitAll()
 
-        // Todo lo demás requiere token válido
+        // RESTO
         .anyRequest().authenticated()
       )
 
-      .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+      .addFilterBefore(
+        jwtFilter,
+        UsernamePasswordAuthenticationFilter.class
+      );
 
     return http.build();
   }
@@ -80,19 +104,36 @@ public class SecurityConfig {
   @Bean
   public CorsConfigurationSource corsConfigurationSource() {
 
-    CorsConfiguration configuration = new CorsConfiguration();
+    CorsConfiguration configuration =
+      new CorsConfiguration();
 
-    configuration.setAllowedOriginPatterns(List.of("*"));
+    configuration.setAllowedOriginPatterns(
+      List.of("*")
+    );
 
-    configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+    configuration.setAllowedMethods(
+      List.of(
+        "GET",
+        "POST",
+        "PUT",
+        "DELETE",
+        "OPTIONS"
+      )
+    );
 
-    configuration.setAllowedHeaders(List.of("*"));
+    configuration.setAllowedHeaders(
+      List.of("*")
+    );
 
-    // CORREGIDO: false para no exigir credenciales en CORS (compatible con allowedOriginPatterns(*))
     configuration.setAllowCredentials(false);
 
-    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-    source.registerCorsConfiguration("/**", configuration);
+    UrlBasedCorsConfigurationSource source =
+      new UrlBasedCorsConfigurationSource();
+
+    source.registerCorsConfiguration(
+      "/**",
+      configuration
+    );
 
     return source;
   }

@@ -13,10 +13,13 @@ import java.util.stream.Collectors;
 
 @Service
 public class EmpresaService {
-
   private final EmpresaRepository empresaRepository;
+
+
   private final PasswordEncoder passwordEncoder;
+
   private final JwtService jwtService;
+
 
   public EmpresaService(EmpresaRepository empresaRepository,
                         @Lazy PasswordEncoder passwordEncoder,
@@ -35,9 +38,7 @@ public class EmpresaService {
       .sector(dto.getSector())
       .pais(dto.getPais())
       .ciudad(dto.getCiudad())
-      .tamano(dto.getTamano() != null
-        ? Empresa.Tamano.valueOf(dto.getTamano().toLowerCase())
-        : Empresa.Tamano.mediana)
+      .tamano(Empresa.Tamano.valueOf(dto.getTamano().toLowerCase()))
       .correoContacto(dto.getCorreoContacto())
       .rol(Empresa.Rol.USER)
       .build();
@@ -52,21 +53,17 @@ public class EmpresaService {
       .collect(Collectors.toList());
   }
 
-  // ── CORREGIDO: ahora mapea TODOS los campos ──────────────────────────────
   private EmpresaDTO convertToDTO(Empresa empresa) {
     return EmpresaDTO.builder()
       .idEmpresa(empresa.getIdEmpresa())
-      .numeroRegistro(empresa.getNumeroRegistro())
       .nombre(empresa.getNombre())
       .sector(empresa.getSector())
       .pais(empresa.getPais())
-      .ciudad(empresa.getCiudad())
-      .tamano(empresa.getTamano() != null ? empresa.getTamano().name() : null)
-      .correoContacto(empresa.getCorreoContacto())
+      // Usamos un operador ternario para evitar el NullPointerException
       .rol(empresa.getRol() != null ? empresa.getRol().name() : "USER")
-      // La contraseña nunca se devuelve al cliente
       .build();
   }
+
 
   public LoginResponse login(String correo, String password) {
     Empresa empresa = empresaRepository.findByCorreoContacto(correo)
@@ -99,22 +96,10 @@ public class EmpresaService {
     empresa.setSector(dto.getSector());
     empresa.setPais(dto.getPais());
     empresa.setCiudad(dto.getCiudad());
-    empresa.setNumeroRegistro(dto.getNumeroRegistro());
-    empresa.setCorreoContacto(dto.getCorreoContacto());
-
-    if (dto.getTamano() != null && !dto.getTamano().isBlank()) {
+    if (dto.getTamano() != null) {
       empresa.setTamano(Empresa.Tamano.valueOf(dto.getTamano().toLowerCase()));
     }
-
-    // Solo re-encripta la contraseña si se envía una nueva
-    if (dto.getPassword() != null && !dto.getPassword().isBlank()) {
-      empresa.setPassword(passwordEncoder.encode(dto.getPassword()));
-    }
-
-    // Permite cambiar el rol desde admin
-    if (dto.getRol() != null && !dto.getRol().isBlank()) {
-      empresa.setRol(Empresa.Rol.valueOf(dto.getRol()));
-    }
+    empresa.setCorreoContacto(dto.getCorreoContacto());
 
     return convertToDTO(empresaRepository.save(empresa));
   }

@@ -12,37 +12,26 @@ import java.util.Map;
 
 @Slf4j
 @RestController
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "http://localhost:4200")
 @RequestMapping("/api/empresas")
 public class EmpresaController {
-
   private final EmpresaService empresaService;
   private final JwtService jwtService;
 
   public EmpresaController(EmpresaService empresaService, JwtService jwtService) {
     this.empresaService = empresaService;
-    this.jwtService     = jwtService;
+    this.jwtService = jwtService;
   }
-
   @GetMapping({"", "/"})
   public ResponseEntity<List<EmpresaDTO>> getAll() {
     return ResponseEntity.ok(empresaService.findAll());
   }
 
-  /** Registro público (formulario de alta) */
   @PostMapping({"", "/"})
   public ResponseEntity<EmpresaDTO> create(@RequestBody EmpresaDTO dto) {
     return ResponseEntity.ok(empresaService.save(dto));
   }
 
-  /**
-   * CORREGIDO: alias /registro usado por el panel de admin para crear empresas.
-   * Requiere autenticación (protegido por SecurityConfig → anyRequest().authenticated()).
-   */
-  @PostMapping("/registro")
-  public ResponseEntity<EmpresaDTO> createFromAdmin(@RequestBody EmpresaDTO dto) {
-    return ResponseEntity.ok(empresaService.save(dto));
-  }
 
   @PostMapping("/login")
   public ResponseEntity<LoginResponse> login(@RequestBody Map<String, String> datos) {
@@ -54,9 +43,7 @@ public class EmpresaController {
   }
 
   @PutMapping("/{id}")
-  public ResponseEntity<EmpresaDTO> update(
-    @PathVariable Long id,
-    @RequestBody EmpresaDTO dto) {
+  public ResponseEntity<EmpresaDTO> update(@PathVariable Long id, @RequestBody EmpresaDTO dto) {
     return ResponseEntity.ok(empresaService.update(id, dto));
   }
 
