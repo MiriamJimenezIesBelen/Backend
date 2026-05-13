@@ -23,99 +23,87 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 public class MedicionServiceTest {
 
-    @Mock
-    private MedicionRepository medicionRepository;
+  @Mock
+  private MedicionRepository medicionRepository;
 
-    @Mock
-    private PlantaRepository plantaRepository;
+  @Mock
+  private EmpresaRepository empresaRepository;
 
-    @Mock
-    private EmpresaRepository empresaRepository;
+  @InjectMocks
+  private MedicionService medicionService;
 
-    @InjectMocks
-    private MedicionService medicionService;
+  private Empresa empresa;
+  private Medicion medicion;
 
-    private Empresa empresa;
-    private Planta planta;
-    private Medicion medicion;
+  @BeforeEach
+  void setUp() {
+    empresa = Empresa.builder()
+      .idEmpresa(1L)
+      .nombre("Tesla Motors")
+      .rol(Empresa.Rol.USER)
+      .build();
 
-    @BeforeEach
-    void setUp() {
-        empresa = Empresa.builder()
-                .idEmpresa(1L)
-                .nombre("Tesla Motors")
-                .rol(Empresa.Rol.USER)
-                .build();
+    medicion = Medicion.builder()
+      .codigoMedicion("MED-001")
+      .empresa(empresa)
+      .fecha(LocalDate.now())
+      .tipo(Medicion.TipoMedicion.electricidad)
+      .valor(new BigDecimal("1500.00"))
+      .build();
+  }
 
-        planta = Planta.builder()
-                .codigoPlanta("P-1")
-                .nombre("Planta principal")
-                .empresa(empresa)
-                .build();
+  @Test
+  void findAll_debeRetornarListaDeMediciones() {
+    when(medicionRepository.findAll()).thenReturn(List.of(medicion));
 
-        medicion = Medicion.builder()
-                .codigoMedicion("MED-001")
-                .planta(planta)
-                .fecha(LocalDate.now())
-                .tipo(Medicion.TipoMedicion.electricidad)
-                .valor(new BigDecimal("1500.00"))
-                .build();
-    }
+    List<MedicionDTO> resultado = medicionService.findAll();
 
-    @Test
-    void findAll_debeRetornarListaDeMediciones() {
-        when(medicionRepository.findAll()).thenReturn(List.of(medicion));
+    assertNotNull(resultado);
+    assertEquals(1, resultado.size());
+    verify(medicionRepository, times(1)).findAll();
+  }
 
-        List<MedicionDTO> resultado = medicionService.findAll();
+  @Test
+  void guardarDesdeFormulario_debeGuardarCuatroMediciones() {
+    when(empresaRepository.findById(1L)).thenReturn(Optional.of(empresa));
+    when(medicionRepository.save(any(Medicion.class))).thenReturn(medicion);
 
-        assertNotNull(resultado);
-        assertEquals(1, resultado.size());
-        verify(medicionRepository, times(1)).findAll();
-    }
+    MedicionDTO dto = MedicionDTO.builder()
+      .idEmpresa(1L)
+      .energia(new BigDecimal("1500"))
+      .agua(new BigDecimal("3000"))
+      .co2(new BigDecimal("400"))
+      .residuos(new BigDecimal("200"))
+      .build();
 
-    @Test
-    void guardarDesdeFormulario_debeGuardarCuatroMediciones() {
-        when(empresaRepository.findById(1L)).thenReturn(Optional.of(empresa));
-        when(plantaRepository.findByEmpresa_IdEmpresa(1L)).thenReturn(List.of(planta));
-        when(medicionRepository.save(any(Medicion.class))).thenReturn(medicion);
+    medicionService.guardarDesdeFormulario(dto);
 
-        MedicionDTO dto = MedicionDTO.builder()
-                .idEmpresa(1L)
-                .energia(new BigDecimal("1500"))
-                .agua(new BigDecimal("3000"))
-                .co2(new BigDecimal("400"))
-                .residuos(new BigDecimal("200"))
-                .build();
+    verify(medicionRepository, times(4)).save(any(Medicion.class));
+  }
 
-        medicionService.guardarDesdeFormulario(dto);
+  @Test
+  void guardarDesdeFormulario_conEmpresaInexistente_debeLanzarExcepcion() {
+    when(empresaRepository.findById(99L)).thenReturn(Optional.empty());
 
-        // Debe guardar 4 mediciones: electricidad, agua, emision, residuo
-        verify(medicionRepository, times(4)).save(any(Medicion.class));
-    }
+    MedicionDTO dto = MedicionDTO.builder()
+      .idEmpresa(99L)
+      .energia(new BigDecimal("1500"))
+      .build();
 
-    @Test
-    void guardarDesdeFormulario_conEmpresaInexistente_debeLanzarExcepcion() {
-        when(empresaRepository.findById(99L)).thenReturn(Optional.empty());
+    assertThrows(RuntimeException.class, () ->
+      medicionService.guardarDesdeFormulario(dto)
+    );
+  }
 
-        MedicionDTO dto = MedicionDTO.builder()
-                .idEmpresa(99L)
-                .energia(new BigDecimal("1500"))
-                .build();
+  @Test
+  void findByEmpresa_debeRetornarMedicionesAgrupadas() {
+    when(medicionRepository.findByEmpresa_IdEmpresa(1L))
+      .thenReturn(List.of(medicion));
 
-        assertThrows(RuntimeException.class, () ->
-                medicionService.guardarDesdeFormulario(dto)
-        );
-    }
+    List<MedicionDTO> resultado = medicionService.findByEmpresa(1L);
 
-    @Test
-    void findByEmpresa_debeRetornarMedicionesAgrupadas() {
-        when(medicionRepository.findByPlanta_Empresa_IdEmpresa(1L))
-                .thenReturn(List.of(medicion));
-
-        List<MedicionDTO> resultado = medicionService.findByEmpresa(1L);
-
-        assertNotNull(resultado);
-        assertEquals(1, resultado.size());
-        verify(medicionRepository, times(1)).findByPlanta_Empresa_IdEmpresa(1L);
-    }
+    assertNotNull(resultado);
+    assertEquals(1, resultado.size());
+    verify(medicionRepository, times(1)).findByEmpresa_IdEmpresa(1L);
+  }
 }
