@@ -56,10 +56,13 @@ public class EmpresaService {
   private EmpresaDTO convertToDTO(Empresa empresa) {
     return EmpresaDTO.builder()
       .idEmpresa(empresa.getIdEmpresa())
+      .numeroRegistro(empresa.getNumeroRegistro())
       .nombre(empresa.getNombre())
       .sector(empresa.getSector())
       .pais(empresa.getPais())
-      // Usamos un operador ternario para evitar el NullPointerException
+      .ciudad(empresa.getCiudad())
+      .tamano(empresa.getTamano() != null ? empresa.getTamano().name() : null)
+      .correoContacto(empresa.getCorreoContacto())
       .rol(empresa.getRol() != null ? empresa.getRol().name() : "USER")
       .build();
   }
