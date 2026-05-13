@@ -7,5 +7,5 @@ import java.util.List;
 
 @Repository
 public interface MedicionRepository extends JpaRepository<Medicion, String> {
-    List<Medicion> findByPlanta_Empresa_IdEmpresa(Long idEmpresa);
+  List<Medicion> findByEmpresa_IdEmpresa(Long idEmpresa);
 }

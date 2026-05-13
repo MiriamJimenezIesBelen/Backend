@@ -14,19 +14,19 @@ import java.time.LocalDate;
 @EqualsAndHashCode(of = "codigoMedicion")
 public class Medicion {
 
-    @Id
-    private String codigoMedicion;
+  @Id
+  private String codigoMedicion;
 
-    private LocalDate fecha;
+  private LocalDate fecha;
 
-    @Enumerated(EnumType.STRING)
-    private TipoMedicion tipo;
+  @Enumerated(EnumType.STRING)
+  private TipoMedicion tipo;
 
-    private BigDecimal valor;
+  private BigDecimal valor;
 
-    @ManyToOne
-    @JoinColumn(name = "codigo_planta")
-    private Planta planta;
+  @ManyToOne
+  @JoinColumn(name = "id_empresa")
+  private Empresa empresa;
 
-    public enum TipoMedicion { electricidad, gas, agua, materia_prima, residuo, emision }
+  public enum TipoMedicion { electricidad, gas, agua, materia_prima, residuo, emision }
 }
