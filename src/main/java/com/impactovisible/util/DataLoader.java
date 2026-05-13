@@ -9,9 +9,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
-
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -19,27 +16,23 @@ public class DataLoader implements CommandLineRunner {
 
   private final EmpresaRepository empresaRepository;
   private final PlantaRepository plantaRepository;
-  private final MedicionRepository medicionRepository;
-  private final UserRepository userRepository;
   private final PasswordEncoder passwordEncoder;
 
   @Override
   @Transactional
   public void run(String... args) {
 
-    String forceReload = System.getenv("FORCE_DATA_RELOAD");
-
-    if (!"true".equals(forceReload) && empresaRepository.count() > 0) {
-      log.info("Ya hay datos, saltando DataLoader.");
+    try {
+      if (empresaRepository.count() > 0) {
+        log.info("Ya hay datos, saltando DataLoader.");
+        return;
+      }
+    } catch (Exception e) {
+      log.warn("Tablas no disponibles aún, saltando DataLoader.");
       return;
     }
-    log.info("Iniciando carga de datos en ImpactoVisibleDB...");
 
-    medicionRepository.deleteAllInBatch();
-    plantaRepository.deleteAllInBatch();
-    empresaRepository.deleteAllInBatch();
-    userRepository.deleteAllInBatch();
-    userRepository.flush();
+    log.info("Iniciando carga de datos en ImpactoVisibleDB...");
 
     // 1. EMPRESA ADMINISTRADORA
     Empresa adminEmpresa = Empresa.builder()
@@ -79,7 +72,7 @@ public class DataLoader implements CommandLineRunner {
       .build();
     plantaRepository.save(gigaFactory);
 
-    // 3. EMPRESA NORMAL — nueva empresa adicional
+    // 3. EMPRESA NORMAL — GreenTech
     Empresa segundaEmpresa = Empresa.builder()
       .nombre("GreenTech Solutions")
       .numeroRegistro("REG-002-ESP")
