@@ -32,4 +32,12 @@ public class MedicionController {
   public ResponseEntity<List<MedicionDTO>> getByEmpresa(@PathVariable Long idEmpresa) {
     return ResponseEntity.ok(service.findByEmpresa(idEmpresa));
   }
+
+  @DeleteMapping("/empresa/{idEmpresa}/fecha/{fecha}")
+  public ResponseEntity<Void> eliminarPorFecha(
+    @PathVariable Long idEmpresa,
+    @PathVariable String fecha) {
+    service.eliminarPorFecha(idEmpresa, fecha);
+    return ResponseEntity.noContent().build();
+  }
 }

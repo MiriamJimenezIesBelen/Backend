@@ -83,4 +83,13 @@ public class MedicionService {
         .build())
       .collect(Collectors.toList());
   }
+
+  public void eliminarPorFecha(Long idEmpresa, String fecha) {
+    LocalDate localDate = LocalDate.parse(fecha);
+    List<Medicion> mediciones = medicionRepository
+      .findByEmpresa_IdEmpresa(idEmpresa);
+    mediciones.stream()
+      .filter(m -> m.getFecha().equals(localDate))
+      .forEach(m -> medicionRepository.delete(m));
+  }
 }
