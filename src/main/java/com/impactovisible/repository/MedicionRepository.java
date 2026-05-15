@@ -9,5 +9,11 @@ import java.util.List;
 
 @Repository
 public interface MedicionRepository extends JpaRepository<Medicion, String> {
-  @Query("SELECT m FROM Medicion m WHERE m.planta.empresa.idEmpresa = :idEmpresa")
-  List<Medicion> findByEmpresa_IdEmpresa(@Param("idEmpresa") Long idEmpresa);}
+  @Query(value = """
+    SELECT m.* FROM mediciones m
+    LEFT JOIN plantas p ON m.codigo_planta = p.codigo_planta
+    WHERE p.id_empresa = :idEmpresa
+       OR m.id_empresa = :idEmpresa
+    """, nativeQuery = true)
+  List<Medicion> findByEmpresa_IdEmpresa(@Param("idEmpresa") Long idEmpresa);
+}
