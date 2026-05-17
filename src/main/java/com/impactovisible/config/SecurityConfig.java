@@ -78,6 +78,11 @@ public class SecurityConfig {
           "/api/empresas"
         ).permitAll()
 
+        .requestMatchers(
+          HttpMethod.POST,
+          "/api/empresas/admin/crear"
+        ).authenticated()
+
         // PING
         .requestMatchers(
           HttpMethod.GET,

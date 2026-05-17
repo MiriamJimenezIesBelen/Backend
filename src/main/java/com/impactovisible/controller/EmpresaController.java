@@ -42,6 +42,11 @@ public class EmpresaController {
     return ResponseEntity.ok(response);
   }
 
+  @PostMapping("/admin/crear")
+  public ResponseEntity<EmpresaDTO> createFromAdmin(@RequestBody EmpresaDTO dto) {
+    return ResponseEntity.ok(empresaService.save(dto));
+  }
+
   @PutMapping("/{id}")
   public ResponseEntity<EmpresaDTO> update(@PathVariable Long id, @RequestBody EmpresaDTO dto) {
     return ResponseEntity.ok(empresaService.update(id, dto));
