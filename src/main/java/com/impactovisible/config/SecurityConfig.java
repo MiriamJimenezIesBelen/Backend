@@ -96,6 +96,7 @@ public class SecurityConfig {
 
         .requestMatchers(HttpMethod.DELETE, "/api/empresas/**").authenticated()
         .requestMatchers(HttpMethod.PUT,    "/api/empresas/**").authenticated()
+        .requestMatchers(HttpMethod.GET,    "/api/empresas/**").authenticated()
 
         // RESTO
         .anyRequest().authenticated()
