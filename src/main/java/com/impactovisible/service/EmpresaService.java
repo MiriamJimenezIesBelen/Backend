@@ -8,80 +8,128 @@ import com.impactovisible.security.JwtService;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
+// Servicio de negocio de Empresa
+// aquí está la lógica principal: guardar, login, update, delete
 @Service
 public class EmpresaService {
+
   private final EmpresaRepository empresaRepository;
-
-
   private final PasswordEncoder passwordEncoder;
-
   private final JwtService jwtService;
 
-
-  public EmpresaService(EmpresaRepository empresaRepository,
-                        @Lazy PasswordEncoder passwordEncoder,
-                        JwtService jwtService) {
+  public EmpresaService(
+    EmpresaRepository empresaRepository,
+    @Lazy PasswordEncoder passwordEncoder,
+    JwtService jwtService
+  ) {
     this.empresaRepository = empresaRepository;
-    this.passwordEncoder   = passwordEncoder;
-    this.jwtService        = jwtService;
+    this.passwordEncoder = passwordEncoder;
+    this.jwtService = jwtService;
   }
 
+  // REGISTRO / CREAR EMPRESA
   public EmpresaDTO save(EmpresaDTO dto) {
+
     Empresa empresa = Empresa.builder()
+
       .idEmpresa(dto.getIdEmpresa())
       .numeroRegistro(dto.getNumeroRegistro())
       .nombre(dto.getNombre())
+
+      // contraseña cifrada antes de guardar
       .password(passwordEncoder.encode(dto.getPassword()))
+
       .sector(dto.getSector())
       .pais(dto.getPais())
       .ciudad(dto.getCiudad())
-      .tamano(Empresa.Tamano.valueOf(dto.getTamano().toLowerCase()))
+
+      .tamano(
+        Empresa.Tamano.valueOf(
+          dto.getTamano().toLowerCase()
+        )
+      )
+
       .correoContacto(dto.getCorreoContacto())
+
+      // por defecto todas son USER
       .rol(Empresa.Rol.USER)
+
       .build();
 
-    Empresa empresaGuardada = empresaRepository.save(empresa);
+    Empresa empresaGuardada =
+      empresaRepository.save(empresa);
+
     return convertToDTO(empresaGuardada);
   }
 
+  // obtener todas las empresas
   public List<EmpresaDTO> findAll() {
-    return empresaRepository.findAll().stream()
+
+    return empresaRepository.findAll()
+      .stream()
       .map(this::convertToDTO)
       .collect(Collectors.toList());
   }
 
+  // convierte entidad a DTO (para no exponer entidad real)
   private EmpresaDTO convertToDTO(Empresa empresa) {
+
     return EmpresaDTO.builder()
+
       .idEmpresa(empresa.getIdEmpresa())
       .numeroRegistro(empresa.getNumeroRegistro())
       .nombre(empresa.getNombre())
       .sector(empresa.getSector())
       .pais(empresa.getPais())
       .ciudad(empresa.getCiudad())
-      .tamano(empresa.getTamano() != null ? empresa.getTamano().name() : null)
+
+      .tamano(
+        empresa.getTamano() != null
+          ? empresa.getTamano().name()
+          : null
+      )
+
       .correoContacto(empresa.getCorreoContacto())
-      .rol(empresa.getRol() != null ? empresa.getRol().name() : "USER")
+
+      .rol(
+        empresa.getRol() != null
+          ? empresa.getRol().name()
+          : "USER"
+      )
+
       .build();
   }
 
-
+  // LOGIN de empresa
   public LoginResponse login(String correo, String password) {
-    Empresa empresa = empresaRepository.findByCorreoContacto(correo)
-      .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
-    if (!passwordEncoder.matches(password, empresa.getPassword())) {
+    // busca usuario por correo
+    Empresa empresa =
+      empresaRepository.findByCorreoContacto(correo)
+        .orElseThrow(
+          () -> new RuntimeException("Usuario no encontrado")
+        );
+
+    // valida password
+    if (!passwordEncoder.matches(
+      password,
+      empresa.getPassword()
+    )) {
       throw new RuntimeException("Credenciales incorrectas");
     }
 
+    // genera JWT
     String token = jwtService.generateToken(
       empresa.getCorreoContacto(),
       empresa.getRol().name(),
       empresa.getIdEmpresa()
     );
 
+    // respuesta al frontend
     return LoginResponse.builder()
       .token(token)
       .idEmpresa(empresa.getIdEmpresa())
@@ -91,22 +139,36 @@ public class EmpresaService {
       .build();
   }
 
+  // actualizar empresa
   public EmpresaDTO update(Long id, EmpresaDTO dto) {
-    Empresa empresa = empresaRepository.findById(id)
-      .orElseThrow(() -> new RuntimeException("Empresa no encontrada"));
+
+    Empresa empresa =
+      empresaRepository.findById(id)
+        .orElseThrow(
+          () -> new RuntimeException("Empresa no encontrada")
+        );
 
     empresa.setNombre(dto.getNombre());
     empresa.setSector(dto.getSector());
     empresa.setPais(dto.getPais());
     empresa.setCiudad(dto.getCiudad());
+
     if (dto.getTamano() != null) {
-      empresa.setTamano(Empresa.Tamano.valueOf(dto.getTamano().toLowerCase()));
+      empresa.setTamano(
+        Empresa.Tamano.valueOf(
+          dto.getTamano().toLowerCase()
+        )
+      );
     }
+
     empresa.setCorreoContacto(dto.getCorreoContacto());
 
-    return convertToDTO(empresaRepository.save(empresa));
+    return convertToDTO(
+      empresaRepository.save(empresa)
+    );
   }
 
+  // eliminar empresa
   public void delete(Long id) {
     empresaRepository.deleteById(id);
   }

@@ -18,23 +18,30 @@ public class DataLoader implements CommandLineRunner {
   private final PlantaRepository plantaRepository;
   private final PasswordEncoder passwordEncoder;
 
+  // Se ejecuta automáticamente al arrancar la aplicación
   @Override
   @Transactional
   public void run(String... args) {
 
+    // =========================================
+    // Evita duplicar datos si ya existen empresas
+    // =========================================
     try {
       if (empresaRepository.count() > 0) {
         log.info("Ya hay datos, saltando DataLoader.");
         return;
       }
     } catch (Exception e) {
+      // Si la BD aún no está lista o no existen tablas
       log.warn("Tablas no disponibles aún, saltando DataLoader.");
       return;
     }
 
     log.info("Iniciando carga de datos en ImpactoVisibleDB...");
 
-    // 1. EMPRESA ADMINISTRADORA
+    // =========================================
+    // 1. EMPRESA ADMINISTRADOR
+    // =========================================
     Empresa adminEmpresa = Empresa.builder()
       .nombre("Admin Global")
       .numeroRegistro("ADM-001")
@@ -46,10 +53,13 @@ public class DataLoader implements CommandLineRunner {
       .password(passwordEncoder.encode("1234"))
       .rol(Empresa.Rol.ADMIN)
       .build();
+
     empresaRepository.save(adminEmpresa);
     log.info("Empresa ADMIN creada: admin@test.com / 1234");
 
-    // 2. EMPRESA NORMAL — Tesla
+    // =========================================
+    // 2. EMPRESA NORMAL (Tesla)
+    // =========================================
     Empresa teslaEmpresa = Empresa.builder()
       .nombre("Tesla Motors")
       .numeroRegistro("REG-999-USA")
@@ -61,18 +71,23 @@ public class DataLoader implements CommandLineRunner {
       .password(passwordEncoder.encode("1234"))
       .rol(Empresa.Rol.USER)
       .build();
+
     empresaRepository.save(teslaEmpresa);
     log.info("Empresa USER creada: user@test.com / 1234");
 
+    // Planta asociada a Tesla
     Planta gigaFactory = Planta.builder()
       .codigoPlanta("TX-01")
       .nombre("Giga Texas")
       .direccion("1 Tesla Road")
       .empresa(teslaEmpresa)
       .build();
+
     plantaRepository.save(gigaFactory);
 
-    // 3. EMPRESA NORMAL — GreenTech
+    // =========================================
+    // 3. EMPRESA NORMAL (GreenTech)
+    // =========================================
     Empresa segundaEmpresa = Empresa.builder()
       .nombre("GreenTech Solutions")
       .numeroRegistro("REG-002-ESP")
@@ -84,15 +99,18 @@ public class DataLoader implements CommandLineRunner {
       .password(passwordEncoder.encode("1234"))
       .rol(Empresa.Rol.USER)
       .build();
+
     empresaRepository.save(segundaEmpresa);
     log.info("Empresa USER creada: greentech@test.com / 1234");
 
+    // Planta asociada a GreenTech
     Planta plantaBarcelona = Planta.builder()
       .codigoPlanta("BCN-01")
       .nombre("Planta Barcelona")
       .direccion("Av. Diagonal 100")
       .empresa(segundaEmpresa)
       .build();
+
     plantaRepository.save(plantaBarcelona);
 
     log.info("Carga de datos finalizada con éxito.");

@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@CrossOrigin(origins = "*")   // <-- CAMBIA ESTO
+@CrossOrigin(origins = "*")
 @RequestMapping("/api/mediciones")
 public class MedicionController {
 
