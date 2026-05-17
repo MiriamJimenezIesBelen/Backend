@@ -94,6 +94,9 @@ public class SecurityConfig {
           "/api/ranking/**"
         ).permitAll()
 
+        .requestMatchers(HttpMethod.DELETE, "/api/empresas/**").authenticated()
+        .requestMatchers(HttpMethod.PUT,    "/api/empresas/**").authenticated()
+
         // RESTO
         .anyRequest().authenticated()
       )

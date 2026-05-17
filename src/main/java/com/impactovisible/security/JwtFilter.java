@@ -42,15 +42,20 @@ public class JwtFilter extends OncePerRequestFilter {
   ) throws ServletException, IOException {
 
     String authHeader = request.getHeader("Authorization");
+    System.out.println("=== JWT FILTER ===");
+    System.out.println("URL: " + request.getRequestURI());
+    System.out.println("Method: " + request.getMethod());
+    System.out.println("Auth header: " + authHeader); // ← ¿llega el token?
 
     if (authHeader != null && authHeader.startsWith("Bearer ")) {
-
       String token = authHeader.substring(7);
+      boolean valid = jwtService.isTokenValid(token);
+      System.out.println("Token válido: " + valid); // ← ¿es válido?
 
-      if (jwtService.isTokenValid(token)) {
-
+      if (valid) {
         String correo = jwtService.extractCorreo(token);
         String rol = jwtService.extractRol(token);
+        System.out.println("Correo: " + correo + " | Rol: " + rol); // ← ¿extrae bien?
 
         SecurityContextHolder.getContext().setAuthentication(
           new UsernamePasswordAuthenticationToken(
