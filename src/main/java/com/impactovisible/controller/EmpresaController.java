@@ -57,4 +57,10 @@ public class EmpresaController {
     empresaService.delete(id);
     return ResponseEntity.noContent().build();
   }
+
+  @PostMapping("/{id}/eliminar")
+  public ResponseEntity<Void> deletePost(@PathVariable Long id) {
+    empresaService.delete(id);
+    return ResponseEntity.noContent().build();
+  }
 }
