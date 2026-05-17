@@ -135,6 +135,9 @@ public class SecurityConfig {
 
     configuration.setAllowCredentials(false);
 
+    // ✅ AÑADE ESTO — permite preflight durante más tiempo
+    configuration.setMaxAge(3600L);
+
     UrlBasedCorsConfigurationSource source =
       new UrlBasedCorsConfigurationSource();
 

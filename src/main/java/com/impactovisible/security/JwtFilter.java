@@ -27,7 +27,12 @@ public class JwtFilter extends OncePerRequestFilter {
 
     String path = request.getRequestURI();
 
+    String method = request.getMethod();
+
     System.out.println("FILTER CHECK: " + path);
+
+    // ✅ AÑADE ESTO — dejar pasar OPTIONS (preflight CORS)
+    if (method.equals("OPTIONS")) return true;
 
     return path.contains("/api/empresas/login")
       || (path.equals("/api/empresas") && request.getMethod().equals("POST"))
