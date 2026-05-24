@@ -20,7 +20,4 @@ public class Informe {
     private LocalDate periodoInicio;
     private LocalDate periodoFin;
 
-    @ManyToOne
-    @JoinColumn(name = "codigo_planta")
-    private Planta planta;
 }

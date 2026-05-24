@@ -20,9 +20,6 @@ public class AccionSostenibilidad {
     @Enumerated(EnumType.STRING)
     private EstadoAccion estado;
 
-    @ManyToOne
-    @JoinColumn(name = "codigo_planta")
-    private Planta planta;
 
     public enum EstadoAccion { planificada, en_progreso, completada }
 }

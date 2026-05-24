@@ -22,7 +22,6 @@ public class InformeService {
                 .idInforme(i.getIdInforme())
                 .periodoInicio(i.getPeriodoInicio())
                 .periodoFin(i.getPeriodoFin())
-                .codigoPlanta(i.getPlanta().getCodigoPlanta())
                 .build();
     }
 }

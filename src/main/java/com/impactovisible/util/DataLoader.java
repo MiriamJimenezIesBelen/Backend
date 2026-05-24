@@ -15,7 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class DataLoader implements CommandLineRunner {
 
   private final EmpresaRepository empresaRepository;
-  private final PlantaRepository plantaRepository;
+
   private final PasswordEncoder passwordEncoder;
 
   // Se ejecuta automáticamente al arrancar la aplicación
@@ -75,15 +75,7 @@ public class DataLoader implements CommandLineRunner {
     empresaRepository.save(teslaEmpresa);
     log.info("Empresa USER creada: user@test.com / 1234");
 
-    // Planta asociada a Tesla
-    Planta gigaFactory = Planta.builder()
-      .codigoPlanta("TX-01")
-      .nombre("Giga Texas")
-      .direccion("1 Tesla Road")
-      .empresa(teslaEmpresa)
-      .build();
 
-    plantaRepository.save(gigaFactory);
 
     // =========================================
     // 3. EMPRESA NORMAL (GreenTech)
@@ -103,15 +95,6 @@ public class DataLoader implements CommandLineRunner {
     empresaRepository.save(segundaEmpresa);
     log.info("Empresa USER creada: greentech@test.com / 1234");
 
-    // Planta asociada a GreenTech
-    Planta plantaBarcelona = Planta.builder()
-      .codigoPlanta("BCN-01")
-      .nombre("Planta Barcelona")
-      .direccion("Av. Diagonal 100")
-      .empresa(segundaEmpresa)
-      .build();
-
-    plantaRepository.save(plantaBarcelona);
 
     log.info("Carga de datos finalizada con éxito.");
   }

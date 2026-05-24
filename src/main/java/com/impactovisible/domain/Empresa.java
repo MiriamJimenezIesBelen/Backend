@@ -33,8 +33,6 @@ public class Empresa {
   @Enumerated(EnumType.STRING)
   private Rol rol;
 
-  @OneToMany(mappedBy = "empresa")
-  private List<Planta> plantas;
 
   public enum Tamano { pequena, mediana, grande }
 

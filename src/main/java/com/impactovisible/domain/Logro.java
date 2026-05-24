@@ -17,7 +17,5 @@ public class Logro {
 
     private String titulo;
 
-    @ManyToOne
-    @JoinColumn(name = "codigo_planta")
-    private Planta planta;
+
 }

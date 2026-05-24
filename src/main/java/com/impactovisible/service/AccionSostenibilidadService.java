@@ -21,7 +21,7 @@ public class AccionSostenibilidadService {
                 .codigoAccion(a.getCodigoAccion())
                 .titulo(a.getTitulo())
                 .estado(a.getEstado().name())
-                .codigoPlanta(a.getPlanta() != null ? a.getPlanta().getCodigoPlanta() : null)
+
                 .build();
     }
 }
